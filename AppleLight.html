@@ -118,18 +118,21 @@
       const tipText = document.getElementById('tipText');
       const resetBtn = document.getElementById('resetBtn');
 
+      const UNIT = 10;
+      const U = (v) => v * UNIT;
+
       const WORLD = {
-        width: 960,
-        height: 540,
-        gravity: 2200,
+        width: U(96),
+        height: U(54),
+        gravity: U(220),
       };
 
       const PLAYER = {
-        w: 28,
-        h: 60,
-        moveSpeed: 300,
-        jumpSpeed: 920,
-        climbSpeed: 220,
+        w: U(2.8),
+        h: U(6),
+        moveSpeed: U(30),
+        jumpSpeed: U(92),
+        climbSpeed: U(22),
       };
 
       const TOTAL_NORMAL_LEVELS = 31;
@@ -180,89 +183,89 @@
 
       function makeBaseLevel(i) {
         const levelNum = i + 1;
-        const baseY = 450;
+        const baseY = U(45);
         const fixed = [
-          { x: 0, y: baseY, w: WORLD.width, h: 90 },
-          { x: 110, y: 360, w: 100, h: 18 },
-          { x: 280, y: 290, w: 110, h: 18 },
-          { x: 470, y: 220, w: 120, h: 18 },
-          { x: 680, y: 300, w: 120, h: 18 },
-          { x: 880, y: 220, w: 130, h: 18 },
+          { x: U(0), y: baseY, w: WORLD.width, h: U(9) },
+          { x: U(11), y: U(36), w: U(10), h: U(1.8) },
+          { x: U(28), y: U(29), w: U(11), h: U(1.8) },
+          { x: U(47), y: U(22), w: U(12), h: U(1.8) },
+          { x: U(68), y: U(30), w: U(12), h: U(1.8) },
+          { x: U(88), y: U(22), w: U(13), h: U(1.8) },
         ];
 
-        const offset = (i % 3) * 12;
+        const offset = U((i % 3) * 1.2);
         const bright = [
-          { x: 180, y: 340 - offset, w: 85, h: 16 },
-          { x: 370, y: 270 + offset, w: 90, h: 16 },
-          { x: 570, y: 200 - offset, w: 100, h: 16 },
-          { x: 750, y: 280 + offset, w: 100, h: 16 },
-          { x: 800, y: 180, w: 75, h: 16 },
+          { x: U(18), y: U(34) - offset, w: U(8.5), h: U(1.6) },
+          { x: U(37), y: U(27) + offset, w: U(9), h: U(1.6) },
+          { x: U(57), y: U(20) - offset, w: U(10), h: U(1.6) },
+          { x: U(75), y: U(28) + offset, w: U(10), h: U(1.6) },
+          { x: U(80), y: U(18), w: U(7.5), h: U(1.6) },
         ];
 
         const dark = [
-          { x: 180, y: 380 + offset, w: 90, h: 16 },
-          { x: 390, y: 310 - offset, w: 90, h: 16 },
-          { x: 590, y: 260 + offset, w: 100, h: 16 },
-          { x: 750, y: 200 - offset, w: 100, h: 16 },
-          { x: 800, y: 340, w: 85, h: 16 },
+          { x: U(18), y: U(38) + offset, w: U(9), h: U(1.6) },
+          { x: U(39), y: U(31) - offset, w: U(9), h: U(1.6) },
+          { x: U(59), y: U(26) + offset, w: U(10), h: U(1.6) },
+          { x: U(75), y: U(20) - offset, w: U(10), h: U(1.6) },
+          { x: U(80), y: U(34), w: U(8.5), h: U(1.6) },
         ];
 
         const switches = [
-          { x: 130, y: 340, w: 16, h: 30 },
-          { x: 320, y: 270, w: 16, h: 30 },
-          { x: 520, y: 200, w: 16, h: 30 },
+          { x: U(13), y: U(34), w: U(1.6), h: U(3) },
+          { x: U(32), y: U(27), w: U(1.6), h: U(3) },
+          { x: U(52), y: U(20), w: U(1.6), h: U(3) },
         ];
 
-        fixed.push({ x: 850, y: 220, w: 100, h: 18 });
+        fixed.push({ x: U(85), y: U(22), w: U(10), h: U(1.8) });
 
         const ladders = [];
         if (levelNum >= 11) {
-          ladders.push({ x: 500, y: 220, w: 16, h: 180 });
+          ladders.push({ x: U(50), y: U(22), w: U(1.6), h: U(18) });
           if (levelNum >= 16) {
-            ladders.push({ x: 750, y: 220, w: 16, h: 200 });
+            ladders.push({ x: U(75), y: U(22), w: U(1.6), h: U(20) });
           }
         }
 
         const movingPlatforms = [];
         if (levelNum >= 21) {
           movingPlatforms.push({
-            x: 620,
-            y: 280,
-            w: 80,
-            h: 16,
-            minX: 570,
-            maxX: 750,
-            speed: 60 + (i % 3) * 15,
+            x: U(62),
+            y: U(28),
+            w: U(8),
+            h: U(1.6),
+            minX: U(57),
+            maxX: U(75),
+            speed: U(6 + (i % 3) * 1.5),
             dir: 1,
           });
           movingPlatforms.push({
-            x: 820,
-            y: 200,
-            w: 80,
-            h: 16,
-            minX: 750,
-            maxX: 880,
-            speed: 70 + (i % 3) * 12,
+            x: U(82),
+            y: U(20),
+            w: U(8),
+            h: U(1.6),
+            minX: U(75),
+            maxX: U(88),
+            speed: U(7 + (i % 3) * 1.2),
             dir: -1,
           });
         }
 
         if (levelNum >= 6) {
-          fixed.push({ x: 260, y: 320 + (i % 2) * 20, w: 80, h: 18 });
+          fixed.push({ x: U(26), y: U(32 + (i % 2) * 2), w: U(8), h: U(1.8) });
         }
         if (levelNum >= 14) {
-          bright.push({ x: 450, y: 160, w: 85, h: 16 });
-          dark.push({ x: 440, y: 380, w: 95, h: 16 });
+          bright.push({ x: U(45), y: U(16), w: U(8.5), h: U(1.6) });
+          dark.push({ x: U(44), y: U(38), w: U(9.5), h: U(1.6) });
         }
         if (levelNum >= 25) {
-          bright.push({ x: 720, y: 140, w: 80, h: 16 });
-          dark.push({ x: 710, y: 400, w: 90, h: 16 });
+          bright.push({ x: U(72), y: U(14), w: U(8), h: U(1.6) });
+          dark.push({ x: U(71), y: U(40), w: U(9), h: U(1.6) });
         }
 
         return {
           id: levelNum,
           name: `关卡 ${levelNum}`,
-          start: { x: 60, y: 380 },
+          start: { x: U(6), y: U(38) },
           lightState: i % 2 === 0 ? 'bright' : 'dark',
           fixed,
           bright,
@@ -270,7 +273,7 @@
           switches,
           ladders,
           movingPlatforms,
-          exit: { x: 900, y: 180, w: 36, h: 50 },
+          exit: { x: U(90), y: U(18), w: U(3.6), h: U(5) },
           hint: levelNum < 11
             ? 'A/D 移动，空格跳跃，F 键触发开关。'
             : levelNum < 21
@@ -283,15 +286,15 @@
         return {
           id: 32,
           name: '隐藏关',
-          start: { x: 60, y: 380 },
+          start: { x: U(6), y: U(38) },
           lightState: 'dark',
-          fixed: [{ x: 0, y: 450, w: WORLD.width, h: 90 }],
+          fixed: [{ x: U(0), y: U(45), w: WORLD.width, h: U(9) }],
           bright: [],
           dark: [],
           switches: [],
           ladders: [],
           movingPlatforms: [],
-          exit: { x: 900, y: 380, w: 36, h: 50 },
+          exit: { x: U(90), y: U(38), w: U(3.6), h: U(5) },
           hint: '隐藏关：沿底部平台前进至终点，获得最终奖励。',
           isHidden: true,
         };
@@ -369,7 +372,7 @@
           if (keys.s) p.vy = PLAYER.climbSpeed;
         } else {
           p.vy += WORLD.gravity * dt;
-          p.vy = Math.min(p.vy, 1400);
+          p.vy = Math.min(p.vy, U(140));
         }
       }
 
@@ -440,7 +443,7 @@
         const pRect = { x: state.player.x, y: state.player.y, w: PLAYER.w, h: PLAYER.h };
         let nearSwitch = null;
         for (const sw of level.switches) {
-          if (rectIntersect(pRect, { x: sw.x - 20, y: sw.y - 20, w: sw.w + 40, h: sw.h + 40 })) {
+          if (rectIntersect(pRect, { x: sw.x - U(2), y: sw.y - U(2), w: sw.w + U(4), h: sw.h + U(4) })) {
             nearSwitch = sw;
             if (keys.f) {
               level.lightState = level.lightState === 'bright' ? 'dark' : 'bright';
