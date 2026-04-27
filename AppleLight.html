@@ -611,16 +611,12 @@
           const active = isBright;
           if (active) {
             drawRect(b, '#000', '#fff');
-          } else {
-            drawRect(b, '#1a1a1a', '#555');
           }
         }
         for (const d of level.dark) {
           const active = !isBright;
           if (active) {
             drawRect(d, '#fff', '#fff');
-          } else {
-            drawRect(d, '#222', '#555');
           }
         }
 
