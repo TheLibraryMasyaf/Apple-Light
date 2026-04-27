@@ -38,7 +38,7 @@
     .hud {
       width: min(960px, 96vw);
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       font-size: 14px;
       align-items: center;
@@ -185,18 +185,11 @@
     <h1>Apple Light</h1>
     <div class="hud" id="hud">
       <div>玩家：<span id="playerText">未开始</span></div>
-      <div>关卡：<span id="levelText">1/32</span></div>
-      <div>灯态：<span id="lightText">明</span></div>
       <div>本关计时：<span id="levelTimerText">0.0s</span></div>
       <div>总计时：<span id="totalTimerText">0.0s</span></div>
-      <button id="resetBtn" type="button">重置本关</button>
     </div>
 
     <canvas id="game" width="960" height="540" aria-label="Apple Light 游戏画布"></canvas>
-
-    <div class="tip" id="tipText">
-      A/D 移动，空格跳跃。F 键触发开关切换明暗。W/S 在有梯子的关卡中可爬下梯子。
-    </div>
   </div>
 
   <div class="overlay" id="startOverlay" role="dialog" aria-modal="true" aria-label="输入玩家名开始游戏">
@@ -214,12 +207,8 @@
       const ctx = canvas.getContext('2d');
 
       const playerText = document.getElementById('playerText');
-      const levelText = document.getElementById('levelText');
-      const lightText = document.getElementById('lightText');
       const levelTimerText = document.getElementById('levelTimerText');
       const totalTimerText = document.getElementById('totalTimerText');
-      const tipText = document.getElementById('tipText');
-      const resetBtn = document.getElementById('resetBtn');
       const startOverlay = document.getElementById('startOverlay');
       const playerNameInput = document.getElementById('playerNameInput');
       const startGameBtn = document.getElementById('startGameBtn');
@@ -438,7 +427,6 @@
           level.lightState = 'dark';
         }
         resetPlayer(level);
-        tipText.textContent = level.hint;
       }
 
       function onSwitchTouched() {
@@ -581,12 +569,10 @@
         if (!level.isHidden && state.currentLevelIndex === TOTAL_NORMAL_LEVELS - 1) {
           state.hiddenUnlocked = canUnlockHidden();
           if (state.hiddenUnlocked) {
-            tipText.textContent = '已解锁隐藏关！继续前进至第 32 关。';
             state.currentLevelIndex = 31;
             resetLevel();
           } else {
             state.gameEnded = true;
-            tipText.textContent = '普通结局：31 关完成。未满足隐藏关解锁条件，可重试追求隐藏关。';
           }
           return;
         }
@@ -594,7 +580,6 @@
         if (level.isHidden) {
           state.rewardUnlocked = true;
           state.gameEnded = true;
-          tipText.textContent = '隐藏关完成！你获得了"背景中的灯"奖励。';
         }
       }
 
@@ -612,10 +597,7 @@
 
       function updateHud() {
         const level = currentLevel();
-        const maxLevel = level.isHidden ? TOTAL_LEVELS : TOTAL_NORMAL_LEVELS;
         playerText.textContent = state.playerName || '未开始';
-        levelText.textContent = `${level.id}/${maxLevel}`;
-        lightText.textContent = level.lightState === 'bright' ? '明' : '暗';
         levelTimerText.textContent = `${state.levelTime.toFixed(1)}s`;
         totalTimerText.textContent = `${state.totalTime.toFixed(1)}s`;
       }
@@ -840,17 +822,6 @@
       window.addEventListener('keydown', (e) => onKey(e, true));
       window.addEventListener('keyup', (e) => onKey(e, false));
 
-      resetBtn.addEventListener('click', () => {
-        if (!state.gameStarted) return;
-        state.gameEnded = false;
-        if (!state.hiddenUnlocked && state.currentLevelIndex === 31) {
-          state.currentLevelIndex = 0;
-          state.clearStates = Array(TOTAL_NORMAL_LEVELS).fill(null);
-          state.totalTime = 0;
-        }
-        resetLevel();
-      });
-
       function startGame() {
         const name = (playerNameInput.value || '').trim();
         if (!name) {
@@ -861,7 +832,6 @@
         state.gameStarted = true;
         state.gameEnded = false;
         startOverlay.classList.add('hidden');
-        tipText.textContent = `欢迎你，${name}。A/D 移动，空格跳跃，F 切换明暗。`;
         state.totalTime = 0;
         resetLevel();
         updateHud();
