@@ -278,6 +278,13 @@
         return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
       }
 
+      function isFullyInCamera(r) {
+        return r.x >= 0
+          && r.y >= 0
+          && r.x + r.w <= WORLD.width
+          && r.y + r.h <= WORLD.height;
+      }
+
       function makeBaseLevel(i) {
         const levelNum = i + 1;
         const baseY = U(45);
@@ -312,7 +319,6 @@
           { x: U(32), y: U(27), w: U(1.6), h: U(3) },
           { x: U(52), y: U(20), w: U(1.6), h: U(3) },
         ];
-        const resetSwitch = { x: U(10), y: U(40), w: U(4), h: U(4) };
 
         fixed.push({ x: U(85), y: U(22), w: U(10), h: U(1.8) });
 
@@ -360,19 +366,28 @@
           dark.push({ x: U(71), y: U(40), w: U(9), h: U(1.6) });
         }
 
+        const fixedInCamera = fixed.filter(isFullyInCamera);
+        const brightInCamera = bright.filter(isFullyInCamera);
+        const darkInCamera = dark.filter(isFullyInCamera);
+        const switchesInCamera = switches.filter(isFullyInCamera);
+        const laddersInCamera = ladders.filter(isFullyInCamera);
+        const movingInCamera = movingPlatforms.filter(isFullyInCamera);
+        const safeExit = isFullyInCamera({ x: U(90), y: U(18), w: U(3.6), h: U(5) })
+          ? { x: U(90), y: U(18), w: U(3.6), h: U(5) }
+          : { x: U(88), y: U(18), w: U(3.6), h: U(5) };
+
         return {
           id: levelNum,
           name: `关卡 ${levelNum}`,
           start: { x: U(6), y: U(38) },
           lightState: i % 2 === 0 ? 'bright' : 'dark',
-          fixed,
-          bright,
-          dark,
-          switches,
-          resetSwitch,
-          ladders,
-          movingPlatforms,
-          exit: { x: U(90), y: U(18), w: U(3.6), h: U(5) },
+          fixed: fixedInCamera,
+          bright: brightInCamera,
+          dark: darkInCamera,
+          switches: switchesInCamera,
+          ladders: laddersInCamera,
+          movingPlatforms: movingInCamera,
+          exit: safeExit,
           hint: levelNum < 11
             ? 'A/D 移动，空格跳跃，F 键触发开关。'
             : levelNum < 21
@@ -391,7 +406,6 @@
           bright: [],
           dark: [],
           switches: [],
-          resetSwitch: { x: U(10), y: U(40), w: U(4), h: U(4) },
           ladders: [],
           movingPlatforms: [],
           exit: { x: U(90), y: U(38), w: U(3.6), h: U(5) },
@@ -540,20 +554,6 @@
 
       function updateSwitches(level) {
         const pRect = { x: state.player.x, y: state.player.y, w: PLAYER.w, h: PLAYER.h };
-
-        const resetSwitch = level.resetSwitch;
-        if (resetSwitch && rectIntersect(pRect, {
-          x: resetSwitch.x - U(2),
-          y: resetSwitch.y - U(2),
-          w: resetSwitch.w + U(4),
-          h: resetSwitch.h + U(4),
-        })) {
-          if (keys.f) {
-            resetLevel();
-            keys.f = false;
-            return;
-          }
-        }
 
         let nearSwitch = null;
         for (const sw of level.switches) {
@@ -753,15 +753,6 @@
           ctx.beginPath();
           ctx.arc(sw.x + sw.w / 2 - state.cameraX, sw.y + 10 - state.cameraY, 6, 0, Math.PI * 2);
           ctx.fill();
-        }
-
-        const rs = level.resetSwitch;
-        if (rs) {
-          const resetColor = level.lightState === 'bright' ? '#000' : '#fff';
-          drawRect(rs, resetColor, '#fff');
-          ctx.fillStyle = level.lightState === 'bright' ? '#fff' : '#000';
-          ctx.font = '12px Consolas';
-          ctx.fillText('RST', rs.x + 6 - state.cameraX, rs.y + 24 - state.cameraY);
         }
 
         drawExit(level);
