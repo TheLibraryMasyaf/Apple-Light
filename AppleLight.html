@@ -81,6 +81,98 @@
       line-height: 1.4;
     }
 
+    .panel {
+      width: min(960px, 96vw);
+      border: 2px solid #f3f3f3;
+      background: #000;
+      padding: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .panel h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+    }
+
+    .leaderboard {
+      display: grid;
+      gap: 4px;
+      max-height: 160px;
+      overflow: auto;
+    }
+
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 0.9fr;
+      gap: 8px;
+      border-top: 1px solid #555;
+      padding-top: 4px;
+    }
+
+    .leaderboard-row:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.86);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .start-card {
+      width: min(460px, 92vw);
+      border: 3px solid #fff;
+      background: #000;
+      padding: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .start-title {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    .start-input {
+      width: 100%;
+      border: 2px solid #fff;
+      background: #111;
+      color: #fff;
+      padding: 10px;
+      font: inherit;
+    }
+
+    .start-btn {
+      border: 2px solid #fff;
+      background: #000;
+      color: #fff;
+      padding: 10px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .start-btn:hover {
+      background: #222;
+    }
+
+    .start-note {
+      font-size: 12px;
+      opacity: 0.9;
+      text-align: center;
+    }
+
     @media (max-width: 900px) {
       .hud {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -92,6 +184,7 @@
   <div class="wrap">
     <h1>Apple Light</h1>
     <div class="hud" id="hud">
+      <div>玩家：<span id="playerText">未开始</span></div>
       <div>关卡：<span id="levelText">1/32</span></div>
       <div>灯态：<span id="lightText">明</span></div>
       <div>本关计时：<span id="levelTimerText">0.0s</span></div>
@@ -106,17 +199,30 @@
     </div>
   </div>
 
+  <div class="overlay" id="startOverlay" role="dialog" aria-modal="true" aria-label="输入玩家名开始游戏">
+    <div class="start-card">
+      <h2 class="start-title">开始游戏</h2>
+      <input id="playerNameInput" class="start-input" type="text" maxlength="20" placeholder="请输入玩家名（1-20字）" />
+      <button id="startGameBtn" class="start-btn" type="button">进入游戏</button>
+      <div class="start-note">输入玩家名后点击“进入游戏”即可开始。</div>
+    </div>
+  </div>
+
   <script>
     (() => {
       const canvas = document.getElementById('game');
       const ctx = canvas.getContext('2d');
 
+      const playerText = document.getElementById('playerText');
       const levelText = document.getElementById('levelText');
       const lightText = document.getElementById('lightText');
       const levelTimerText = document.getElementById('levelTimerText');
       const totalTimerText = document.getElementById('totalTimerText');
       const tipText = document.getElementById('tipText');
       const resetBtn = document.getElementById('resetBtn');
+      const startOverlay = document.getElementById('startOverlay');
+      const playerNameInput = document.getElementById('playerNameInput');
+      const startGameBtn = document.getElementById('startGameBtn');
 
       const UNIT = 10;
       const U = (v) => v * UNIT;
@@ -149,6 +255,8 @@
       };
 
       const state = {
+        playerName: '',
+        gameStarted: false,
         currentLevelIndex: 0,
         levels: [],
         cameraX: 0,
@@ -505,6 +613,7 @@
       function updateHud() {
         const level = currentLevel();
         const maxLevel = level.isHidden ? TOTAL_LEVELS : TOTAL_NORMAL_LEVELS;
+        playerText.textContent = state.playerName || '未开始';
         levelText.textContent = `${level.id}/${maxLevel}`;
         lightText.textContent = level.lightState === 'bright' ? '明' : '暗';
         levelTimerText.textContent = `${state.levelTime.toFixed(1)}s`;
@@ -668,6 +777,11 @@
       }
 
       function update(dt) {
+        if (!state.gameStarted) {
+          updateHud();
+          return;
+        }
+
         if (state.gameEnded) {
           updateHud();
           return;
@@ -699,6 +813,11 @@
       }
 
       function onKey(e, down) {
+        if (!state.gameStarted) {
+          if (e.key === ' ') e.preventDefault();
+          return;
+        }
+
         const k = e.key.toLowerCase();
         if (k === 'a') keys.a = down;
         if (k === 'd') keys.d = down;
@@ -722,6 +841,7 @@
       window.addEventListener('keyup', (e) => onKey(e, false));
 
       resetBtn.addEventListener('click', () => {
+        if (!state.gameStarted) return;
         state.gameEnded = false;
         if (!state.hiddenUnlocked && state.currentLevelIndex === 31) {
           state.currentLevelIndex = 0;
@@ -731,8 +851,33 @@
         resetLevel();
       });
 
+      function startGame() {
+        const name = (playerNameInput.value || '').trim();
+        if (!name) {
+          playerNameInput.focus();
+          return;
+        }
+        state.playerName = name;
+        state.gameStarted = true;
+        state.gameEnded = false;
+        startOverlay.classList.add('hidden');
+        tipText.textContent = `欢迎你，${name}。A/D 移动，空格跳跃，F 切换明暗。`;
+        state.totalTime = 0;
+        resetLevel();
+        updateHud();
+      }
+
+      startGameBtn.addEventListener('click', startGame);
+      playerNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          startGame();
+        }
+      });
+
       buildLevels();
       resetLevel();
+      updateHud();
+      playerNameInput.focus();
       requestAnimationFrame(loop);
     })();
   </script>
