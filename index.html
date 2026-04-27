@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Apple Light</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <h1>Apple Light</h1>
+    <div class="hud" id="hud">
+      <div>关卡：<span id="levelText">1/32</span></div>
+      <div>灯态：<span id="lightText">明</span></div>
+      <div>本关计时：<span id="levelTimerText">0.0s</span></div>
+      <div>总计时：<span id="totalTimerText">0.0s</span></div>
+      <button id="resetBtn" type="button">重置本关</button>
+    </div>
+
+    <canvas id="game" width="960" height="540" aria-label="Apple Light 游戏画布"></canvas>
+
+    <div class="tip" id="tipText">
+      A/D 移动，空格跳跃。F 键触发开关切换明暗。W/S 在有梯子的关卡中可爬下梯子。
+    </div>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>
