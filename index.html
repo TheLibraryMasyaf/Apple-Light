@@ -312,7 +312,7 @@
           { x: U(32), y: U(27), w: U(1.6), h: U(3) },
           { x: U(52), y: U(20), w: U(1.6), h: U(3) },
         ];
-        const resetSwitch = { x: U(3.2), y: U(42), w: U(2.4), h: U(3) };
+        const resetSwitch = { x: U(10), y: U(40), w: U(4), h: U(4) };
 
         fixed.push({ x: U(85), y: U(22), w: U(10), h: U(1.8) });
 
@@ -391,7 +391,7 @@
           bright: [],
           dark: [],
           switches: [],
-          resetSwitch: { x: U(3.2), y: U(42), w: U(2.4), h: U(3) },
+          resetSwitch: { x: U(10), y: U(40), w: U(4), h: U(4) },
           ladders: [],
           movingPlatforms: [],
           exit: { x: U(90), y: U(38), w: U(3.6), h: U(5) },
@@ -757,10 +757,11 @@
 
         const rs = level.resetSwitch;
         if (rs) {
-          drawRect(rs, isBright ? '#000' : '#fff', '#fff');
-          ctx.fillStyle = isBright ? '#fff' : '#000';
+          const resetColor = level.lightState === 'bright' ? '#000' : '#fff';
+          drawRect(rs, resetColor, '#fff');
+          ctx.fillStyle = level.lightState === 'bright' ? '#fff' : '#000';
           ctx.font = '12px Consolas';
-          ctx.fillText('R', rs.x + rs.w / 2 - 4 - state.cameraX, rs.y + 19 - state.cameraY);
+          ctx.fillText('RST', rs.x + 6 - state.cameraX, rs.y + 24 - state.cameraY);
         }
 
         drawExit(level);
